@@ -94,11 +94,15 @@ namespace FlightMobileApp.Manager
                      {
                          // Gets: 
                          string s;
+                         double val;
                          int len;
                          
                          // Aileron.
                          this.telnetClient.write("set /controls/flight/aileron\r\n");
                          this.telnetClient.write("get /controls/flight/aileron\r\n");
+                         s = telnetClient.read();
+                         val = Convert.ToDouble(s);
+
                          s = (getBetween(telnetClient.read(), "=", "(string)")).Trim();
                          len = s.Length;
                          aileron = Convert.ToDouble(s.Substring(1, len - 2));
@@ -106,6 +110,9 @@ namespace FlightMobileApp.Manager
                          // Elevator.
                          this.telnetClient.write("set /controls/flight/elevator\r\n");
                          this.telnetClient.write("get /controls/flight/elevator\r\n");
+                         s = telnetClient.read();
+                         val = Convert.ToDouble(s);
+
                          s = (getBetween(telnetClient.read(), "=", "(string)")).Trim();
                          len = s.Length;
                          elevator = Convert.ToDouble(s.Substring(1, len - 2));
@@ -113,6 +120,9 @@ namespace FlightMobileApp.Manager
                          // Rudder.
                          this.telnetClient.write("set /controls/flight/rudder\r\n");
                          this.telnetClient.write("get /controls/flight/rudder\r\n");
+                         s = telnetClient.read();
+                         val = Convert.ToDouble(s);
+
                          s = (getBetween(telnetClient.read(), "=", "(string)")).Trim();
                          len = s.Length;
                          rudder = Convert.ToDouble(s.Substring(1, len - 2));
@@ -120,6 +130,9 @@ namespace FlightMobileApp.Manager
                          // Throttle.
                          this.telnetClient.write("set /controls/flight/throttle\r\n");
                          this.telnetClient.write("get /controls/engines/current-engine/throttle\r\n");
+                         s = telnetClient.read();
+                         val = Convert.ToDouble(s);
+
                          s = (getBetween(telnetClient.read(), "=", "(string)")).Trim();
                          len = s.Length;
                          throttle = Convert.ToDouble(s.Substring(1, len - 2));
