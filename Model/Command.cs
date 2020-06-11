@@ -1,15 +1,17 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace FlightMobileApp.Model
+namespace FlightMoblie.Model
 {
     public class Command
     {
-       public string aileron;
-       public string rudder;
-       public string elevator;
-       public string throttle;
+        public double aileron { get; set; }
+        public double rudder { get; set; }
+        public double elevator { get; set; }
+        public double throttle { get; set; }
     }
 }

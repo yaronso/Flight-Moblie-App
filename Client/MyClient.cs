@@ -5,13 +5,13 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FlightMobileApp.Client
+namespace FlightMoblie.Client
 {
     public class MyClient : IClient
     {
         // Class fields
-        private TcpClient _client;
-        private NetworkStream _ns;
+        public TcpClient _client;
+        public NetworkStream _ns;
 
         // A property.
         private Boolean isc = false;
@@ -65,8 +65,6 @@ namespace FlightMobileApp.Client
             catch (Exception e)
             {
                 return e.ToString();
-                //Console.WriteLine("time out read");
-                //return "Time Out 10s";
             }
         }
 

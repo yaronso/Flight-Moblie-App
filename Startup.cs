@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FlightMobileApp.Client;
-using FlightMobileApp.Manager;
+using FlightMoblie.Client;
+using FlightMoblie.Manager;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace FlightMobileApp
+namespace FlightMoblie
 {
     public class Startup
     {
@@ -28,6 +28,7 @@ namespace FlightMobileApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            // Using Singelton DP.
             services.AddSingleton(typeof(IClient), typeof(MyClient));
             services.AddSingleton(typeof(CommandManager));
         }
