@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FlightMoblie.Client;
 using FlightMoblie.Manager;
@@ -31,6 +32,7 @@ namespace FlightMoblie
             // Using Singelton DP.
             services.AddSingleton(typeof(IClient), typeof(MyClient));
             services.AddSingleton(typeof(CommandManager));
+            services.AddSingleton(typeof(Mutex));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

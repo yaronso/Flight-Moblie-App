@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using FlightMobile.Model;
 using FlightMoblie.Client;
 using FlightMoblie.Manager;
 using FlightMoblie.Model;
@@ -27,37 +28,38 @@ namespace FlightMoblie.Controllers
             client = c;
             commandManager = manger;
             commandManager = new CommandManager(client);
-            commandManager.connect("localhost", 5402);
-            commandManager.write("data\r\n");
+            //commandManager.connect("127.0.0.1", 5402);
+            //commandManager.write("data\r\n");
         }
 
-        // POST: /api/command
+        // POST: http://127.0.0.1:50658/api/command
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Command cmd)
+        public IActionResult Post([FromBody] Command cmd)
         {
+            Result result;
             try
             {
-                //Debug.WriteLine("aileron from controller " + cmd.aileron);
-                this.commandManager.startFromSimulator(cmd);
-                return Ok();
+                result = commandManager.Execute(cmd).Result;
             }
             catch (Exception e)
             {
-                e.ToString();
-                return BadRequest();
+                return BadRequest(e.Message);
             }
+
+            if (result == Result.NotOk)
+            {
+                return BadRequest("Problem in sending data to the simulator!");
+            }
+            return Ok();
         }
 
-        // GET:  localhost:44347/screenshot
+        // GET:  http://127.0.0.1:50658/api/command
         [HttpGet]
         public async Task<IActionResult> GetScreenShot()
         {
-            Debug.WriteLine("Get Screen Shot debug 1");
             var client = new HttpClient();
             HttpResponseMessage response = await client.GetAsync("http://localhost:8080/screenshot");
-            Debug.WriteLine("Get Screen Shot debug 2");
             var image = await response.Content.ReadAsByteArrayAsync();
-            Debug.WriteLine("Get Screen Shot debug 3");
             return File(image, "Image/jpg");
         }
     }

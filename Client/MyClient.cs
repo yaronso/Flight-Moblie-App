@@ -32,7 +32,7 @@ namespace FlightMoblie.Client
             // Using try & catch to deal with a case of error in connection.
             try
             {
-                _client = new TcpClient("localhost", port);
+                _client = new TcpClient(ip, port);
                 _ns = _client.GetStream();
                 isc = true;
 

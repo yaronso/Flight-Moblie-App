@@ -1,9 +1,12 @@
-﻿using FlightMoblie.Client;
+﻿using FlightMobile.Model;
+using FlightMoblie.Client;
 using FlightMoblie.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,12 +17,14 @@ namespace FlightMoblie.Manager
         // Fields.
         IClient telnetClient;
         private volatile Boolean stop; 
-        public Mutex MuTexLock = new Mutex();
+        private BlockingCollection<AsyncCommand> queue;
 
         // CTR
         public CommandManager(IClient c)
         {
+            this.queue = new BlockingCollection<AsyncCommand>();
             this.telnetClient = c;
+            Start();
         }
 
         public void connect(string ip, int port)
@@ -53,6 +58,53 @@ namespace FlightMoblie.Manager
             }
         }
 
+        // new Execute
+        public Task<Result> Execute(Command cmd)
+        {
+            var asyncCommand = new AsyncCommand(cmd);
+            queue.Add(asyncCommand);
+            return asyncCommand.Task;
+        }
+
+        // new start
+        public void Start()
+        {
+            Task.Factory.StartNew(ProcessCommands);
+        }
+        
+        // new process commands
+        public void ProcessCommands()
+        {
+            try
+            {
+                connect("127.0.0.1", 5402);
+                write("data\r\n");
+
+            } catch (Exception e)
+            {
+                e.ToString();
+                Debug.WriteLine("im here");
+                return;
+            }
+            // iterate through the async commands in the queue.
+            foreach(AsyncCommand asyncCommand in queue.GetConsumingEnumerable())
+            {
+                Result result;
+                var command = asyncCommand.Command;
+                try
+                {
+                    startFromSimulator(command);
+                    result = Result.Ok;
+                    asyncCommand.Completion.SetResult(result);
+                } catch (Exception)
+                {
+                    Debug.WriteLine("catch of startFromSimulator");
+                    result = Result.NotOk;
+                    asyncCommand.Completion.SetResult(result);
+                }
+            }
+        }
+
 
         public double aileron
         {
@@ -62,6 +114,8 @@ namespace FlightMoblie.Manager
                 aileron = value;
             }
         }
+
+
 
         public double throttle
         {
@@ -87,7 +141,6 @@ namespace FlightMoblie.Manager
         // The logic of the sampling function from the simulator.
         public void startFromSimulator(Command command)
         {
-
                 try
                 {
                         // Gets: 
@@ -98,32 +151,21 @@ namespace FlightMoblie.Manager
                        this.telnetClient.write("set /controls/flight/aileron " + command.aileron + "\r\n");
                        this.telnetClient.write("get /controls/flight/aileron \r\n");
                        s = telnetClient.read();
-                       val = Convert.ToDouble(s);
-                       Debug.WriteLine("Aileron works good " + val);
-
 
                         // Elevator.
                         this.telnetClient.write("set /controls/flight/elevator " + command.elevator + "\r\n");
                         this.telnetClient.write("get /controls/flight/elevator \r\n");
                         s = telnetClient.read();
-                        val = Convert.ToDouble(s);
-                        Debug.WriteLine("Elevator works good " + val);
-
 
                         // Rudder.
                         this.telnetClient.write("set /controls/flight/rudder " + command.rudder + "\r\n");
                         this.telnetClient.write("get /controls/flight/rudder \r\n");
                         s = telnetClient.read();
-                        val = Convert.ToDouble(s);
-                        Debug.WriteLine("Rudder works good " + val);
-
 
                         // Throttle.
                         this.telnetClient.write("set /controls/engines/current-engine/throttle " + command.throttle + "\r\n");
                         this.telnetClient.write("get /controls/engines/current-engine/throttle \r\n");
                         s = telnetClient.read();
-                        val = Convert.ToDouble(s);
-                        Debug.WriteLine("throttle works good " + val);
 
                        this.telnetClient.write("data\r\n");
                 }
@@ -132,7 +174,6 @@ namespace FlightMoblie.Manager
                    Debug.WriteLine("problem in the catch");
                     e.ToString();
                 }
-            //}).Start();
 
         }
     }
