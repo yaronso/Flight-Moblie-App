@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FlightMoblie.Controllers
 {
+    // The following controller has two http commands.
     [Route("api/[controller]")]
     [ApiController]
     public class CommandController : ControllerBase

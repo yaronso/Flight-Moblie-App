@@ -1,5 +1,6 @@
 ﻿namespace FlightMoblie.Model
 {
+    // The following class own the 4th rudders of the Flight Gear.
     public class Command
     {
         public double aileron { get; set; }

@@ -1,7 +1,4 @@
 ﻿using FlightMoblie.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FlightMobile.Model
@@ -16,7 +13,6 @@ namespace FlightMobile.Model
         public AsyncCommand(Command input)
         {
             Command = input;
-            // Watch out! Run Continuations Async is important!
             Completion = new TaskCompletionSource<Result>(
             TaskCreationOptions.RunContinuationsAsynchronously);
         }

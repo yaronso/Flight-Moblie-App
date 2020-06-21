@@ -3,20 +3,17 @@ using FlightMoblie.Client;
 using FlightMoblie.Model;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace FlightMoblie.Manager
 {
+    // The following class implements the ICommandManager. It uses dependency injection of the IClient class 
+    // and a queue from type AsyncCommand.
     public class CommandManager : ICommandManager
     {
         // Fields.
         IClient telnetClient;
-        private volatile Boolean stop; 
         private BlockingCollection<AsyncCommand> queue;
 
         // CTR
@@ -27,6 +24,7 @@ namespace FlightMoblie.Manager
             Start();
         }
 
+        // The following 4th functions are implementations of the interface IClient's functions.
         public void connect(string ip, int port)
         {
             telnetClient.connect(ip, port);
@@ -49,16 +47,7 @@ namespace FlightMoblie.Manager
         }
 
 
-        public double elevator
-        {
-            get { return elevator; }
-            set
-            {
-                elevator = value;
-            }
-        }
-
-        // new Execute
+        // The following function init a new async command and enqueue it.
         public Task<Result> Execute(Command cmd)
         {
             var asyncCommand = new AsyncCommand(cmd);
@@ -66,7 +55,7 @@ namespace FlightMoblie.Manager
             return asyncCommand.Task;
         }
 
-        // new start
+        // The following function invokes the function ProcessCommands().
         public void Start()
         {
             Task.Factory.StartNew(ProcessCommands);
@@ -75,6 +64,7 @@ namespace FlightMoblie.Manager
         // new process commands
         public void ProcessCommands()
         {
+            // Try to connect the Flight Gear
             try
             {
                 connect("127.0.0.1", 5402);
@@ -83,28 +73,38 @@ namespace FlightMoblie.Manager
             } catch (Exception e)
             {
                 e.ToString();
-                Debug.WriteLine("im here");
                 return;
             }
-            // iterate through the async commands in the queue.
+            // Iterate through the async commands in the queue.
             foreach(AsyncCommand asyncCommand in queue.GetConsumingEnumerable())
             {
                 Result result;
                 var command = asyncCommand.Command;
+                // Send the async commands to the Flight Gear by calling startFromSimulator with the specific command.
                 try
                 {
                     startFromSimulator(command);
                     result = Result.Ok;
+                    // Set the async command's result as Ok.
                     asyncCommand.Completion.SetResult(result);
                 } catch (Exception)
                 {
-                    Debug.WriteLine("catch of startFromSimulator");
+                    // In a case of exception set the the async command's result as Not OK.
                     result = Result.NotOk;
                     asyncCommand.Completion.SetResult(result);
                 }
             }
         }
 
+        // The 4th properties of the Flight Gear's rudders:
+        public double elevator
+        {
+            get { return elevator; }
+            set
+            {
+                elevator = value;
+            }
+        }
 
         public double aileron
         {
@@ -138,14 +138,12 @@ namespace FlightMoblie.Manager
             }
         }
 
-        // The logic of the sampling function from the simulator.
+        // The following function sets & gets the Flight Gear's values of the 4th rudders.
         public void startFromSimulator(Command command)
         {
                 try
                 {
-                        // Gets: 
                        string s;
-                       double val;
 
                        // Aileron.
                        this.telnetClient.write("set /controls/flight/aileron " + command.aileron + "\r\n");
@@ -171,7 +169,6 @@ namespace FlightMoblie.Manager
                 }
                 catch (Exception e)
                 {
-                   Debug.WriteLine("problem in the catch");
                     e.ToString();
                 }
 
