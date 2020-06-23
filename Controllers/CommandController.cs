@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using FlightMobile.Model;
+using FlightMobileWeb.Model;
 using FlightMoblie.Client;
 using FlightMoblie.Manager;
 using FlightMoblie.Model;
@@ -29,8 +30,7 @@ namespace FlightMoblie.Controllers
             client = c;
             commandManager = manger;
             commandManager = new CommandManager(client);
-            //commandManager.connect("127.0.0.1", 5402);
-            //commandManager.write("data\r\n");
+   
         }
 
         // POST: http://127.0.0.1:50658/api/command
@@ -58,8 +58,9 @@ namespace FlightMoblie.Controllers
         [HttpGet]
         public async Task<IActionResult> GetScreenShot()
         {
+            string address = InitContext.httpAddress;
             var client = new HttpClient();
-            HttpResponseMessage response = await client.GetAsync("http://localhost:8080/screenshot");
+            HttpResponseMessage response = await client.GetAsync(address + "/screenshot");
             var image = await response.Content.ReadAsByteArrayAsync();
             return File(image, "Image/jpg");
         }

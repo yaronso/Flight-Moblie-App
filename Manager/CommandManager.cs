@@ -1,4 +1,5 @@
 ﻿using FlightMobile.Model;
+using FlightMobileWeb.Model;
 using FlightMoblie.Client;
 using FlightMoblie.Model;
 using System;
@@ -67,7 +68,8 @@ namespace FlightMoblie.Manager
             // Try to connect the Flight Gear
             try
             {
-                connect("127.0.0.1", 5402);
+                connect(InitContext.ip, int.Parse(InitContext.port));
+               // connect("127.0.0.1", 5402);
                 write("data\r\n");
 
             } catch (Exception e)

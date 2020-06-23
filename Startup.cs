@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FlightMobileWeb.Model;
 using FlightMoblie.Client;
 using FlightMoblie.Manager;
 using Microsoft.AspNetCore.Builder;
@@ -28,6 +29,9 @@ namespace FlightMoblie
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            InitContext.ip = Configuration.GetValue<string>("Logging:simulatortcp:ip");
+            InitContext.port = Configuration.GetValue<string>("Logging:simulatortcp:port");
+            InitContext.httpAddress = Configuration.GetValue<string>("Logging:simulatortcp:HttpAddress");
             services.AddControllers();
             // Using Singelton DP.
             services.AddSingleton(typeof(IClient), typeof(MyClient));
